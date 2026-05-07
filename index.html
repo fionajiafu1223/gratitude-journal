@@ -56,6 +56,7 @@ body{font-family:'Noto Serif SC',serif;background:radial-gradient(ellipse at 50%
 .weekdays span{text-align:center;font-size:11px;color:#9a7a4a;padding:3px 0;}
 .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;position:relative;flex:1;}
 .day-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:11px;color:#5a3a1a;transition:background 0.2s;aspect-ratio:1;align-self:center;}
+.day-cell.has-entry{background:none !important;border-radius:0;}
 .day-cell:hover:not(.empty){background:rgba(180,130,60,0.15);}
 .day-cell.today{background:rgba(180,130,60,0.2);color:#7a4f1a;font-weight:600;}
 .day-cell.empty{cursor:default;}
