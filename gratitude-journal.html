@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>感恩日记</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Ma+Shan+Zheng&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Serif SC',serif;background:radial-gradient(ellipse at 50% 30%,#2a1a4e 0%,#150d2e 60%,#0a0618 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#e8d5b7;}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--dur) infinite alternate;}
+@keyframes twinkle{0%{opacity:0.1;}100%{opacity:0.8;}}
+.screen{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:1;transition:opacity 0.6s;top:0;left:0;overflow-y:auto;}
+.screen.hidden{opacity:0;pointer-events:none;}
+#coverScreen{flex-direction:column;}
+.book-scene{position:relative;width:300px;height:400px;}
+.book-svg{width:100%;height:100%;filter:drop-shadow(0 20px 60px rgba(80,40,160,0.6));}
+.open-hint{text-align:center;margin-top:1.5rem;font-size:12px;color:#a07840;letter-spacing:3px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+.hand-wrapper{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:150px;cursor:pointer;animation:float 3s ease-in-out infinite;transition:transform 0.2s;z-index:10;}
+.hand-wrapper:hover{transform:translateX(-50%) scale(1.05);}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-8px);}}
+.hand-wrapper.opening{animation:openBook 1.2s forwards;}
+@keyframes openBook{0%{transform:translateX(-50%) translateY(0);}30%{transform:translateX(-50%) translateY(-20px) rotate(-5deg);}60%{transform:translateX(-50%) translateY(-60px) rotate(-15deg);}100%{transform:translateX(-50%) translateY(-200px) rotate(-30deg);opacity:0;}}
+#calScreen{flex-direction:column;padding:1.5rem;align-items:center;}
+#calScreen.entering{animation:fadeUp 0.8s forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.cal-container{background:rgba(30,15,60,0.85);border:1px solid #7a5520;border-radius:20px;padding:1.5rem;width:100%;max-width:380px;box-shadow:0 0 40px rgba(120,80,20,0.3),inset 0 0 60px rgba(80,40,120,0.2);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.cal-title{font-family:'Ma Shan Zheng',serif;font-size:18px;color:#d4a843;letter-spacing:2px;}
+.cal-nav-btn{background:none;border:1px solid #7a5520;border-radius:50%;width:28px;height:28px;color:#d4a843;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.cal-nav-btn:hover{background:rgba(212,168,67,0.15);}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:0.4rem;}
+.weekdays span{text-align:center;font-size:11px;color:#7a5c8a;padding:4px 0;letter-spacing:1px;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;position:relative;}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:12px;color:#c8a8e0;transition:background 0.2s;position:relative;}
+.day-cell:hover:not(.empty){background:rgba(160,100,220,0.2);}
+.day-cell.today{background:rgba(120,60,180,0.3);color:#d4a843;font-weight:600;}
+.day-cell.empty{cursor:default;}
+.heart-badge{font-size:20px;line-height:1;}
+.day-num-small{font-size:9px;color:#7a5c8a;margin-top:1px;}
+.day-cell.has-entry .day-num-small{display:none;}
+.connector-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,6,24,0.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+.modal-card{background:linear-gradient(160deg,#1e0f3c,#2a1050);border:1px solid #7a5520;border-radius:24px;padding:2rem;width:300px;text-align:center;box-shadow:0 0 60px rgba(120,60,200,0.4);transform:scale(0.9);transition:transform 0.3s;}
+.modal-overlay.active .modal-card{transform:scale(1);}
+.modal-date{font-size:13px;color:#a07840;letter-spacing:2px;margin-bottom:1rem;}
+.modal-label{font-size:14px;color:#c8a8e0;margin-bottom:1.2rem;letter-spacing:1px;}
+.mood-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.mood-btn{font-size:28px;cursor:pointer;border-radius:50%;padding:8px;border:2px solid transparent;transition:transform 0.2s,border-color 0.2s;background:rgba(255,255,255,0.05);}
+.mood-btn:hover{transform:scale(1.2);}
+.mood-btn.selected{border-color:#d4a843;background:rgba(212,168,67,0.1);}
+.modal-confirm{width:100%;padding:10px;background:linear-gradient(135deg,#7a3fa0,#a060c0);border:none;border-radius:12px;color:#f0e0ff;font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s;}
+.modal-confirm:hover{opacity:0.85;}
+#journalScreen{flex-direction:column;padding:1.5rem;align-items:center;}
+.journal-container{background:rgba(30,15,60,0.85);border:1px solid #7a5520;border-radius:20px;padding:1.5rem;width:100%;max-width:380px;box-shadow:0 0 40px rgba(120,80,20,0.3);}
+.journal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.back-btn{background:none;border:1px solid #7a5520;border-radius:10px;padding:4px 12px;color:#a07840;font-size:12px;cursor:pointer;letter-spacing:1px;}
+.back-btn:hover{background:rgba(212,168,67,0.1);}
+.journal-date-title{font-family:'Ma Shan Zheng',serif;font-size:16px;color:#d4a843;letter-spacing:2px;}
+.selected-mood-display{font-size:22px;}
+.guide{font-size:13px;color:#8a6a9a;font-style:italic;letter-spacing:1px;margin-bottom:0.8rem;}
+textarea{width:100%;min-height:160px;background:rgba(255,255,255,0.04);border:1px solid rgba(120,80,180,0.3);border-radius:14px;padding:1rem;color:#e0caf0;font-family:'Noto Serif SC',serif;font-size:14px;line-height:1.9;resize:none;outline:none;transition:border-color 0.2s;}
+textarea:focus{border-color:rgba(160,100,220,0.6);}
+textarea::placeholder{color:#4a3060;}
+.save-btn{margin-top:1rem;width:100%;padding:12px;background:linear-gradient(135deg,#7a3fa0,#a060c0);border:none;border-radius:14px;color:#f0e0ff;font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:2px;cursor:pointer;transition:opacity 0.2s,transform 0.1s;}
+.save-btn:hover{opacity:0.9;}
+.save-btn:active{transform:scale(0.98);}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="screen" id="coverScreen">
+  <div class="book-scene">
+    <svg class="book-svg" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="coverGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2d1060"/><stop offset="50%" stop-color="#1a0840"/><stop offset="100%" stop-color="#0e0528"/></linearGradient>
+        <linearGradient id="spineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3d1880"/><stop offset="100%" stop-color="#1a0840"/></linearGradient>
+        <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0d060"/><stop offset="50%" stop-color="#c8901a"/><stop offset="100%" stop-color="#f0d060"/></linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <ellipse cx="160" cy="408" rx="120" ry="12" fill="rgba(0,0,0,0.5)"/>
+      <rect x="260" y="20" width="20" height="370" rx="3" fill="#e8dcc8"/>
+      <line x1="262" y1="20" x2="262" y2="390" stroke="#c8b090" stroke-width="0.5" opacity="0.6"/>
+      <line x1="265" y1="20" x2="265" y2="390" stroke="#c8b090" stroke-width="0.5" opacity="0.4"/>
+      <line x1="268" y1="20" x2="268" y2="390" stroke="#c8b090" stroke-width="0.5" opacity="0.3"/>
+      <rect x="30" y="15" width="235" height="375" rx="6" fill="url(#coverGrad)"/>
+      <rect x="30" y="15" width="235" height="375" rx="6" fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
+      <rect x="44" y="28" width="207" height="349" rx="4" fill="none" stroke="#c8901a" stroke-width="1" opacity="0.6"/>
+      <rect x="30" y="15" width="22" height="375" rx="4" fill="url(#spineGrad)"/>
+      <line x1="52" y1="15" x2="52" y2="390" stroke="#c8901a" stroke-width="1" opacity="0.5"/>
+      <g fill="none" stroke="#c8901a" stroke-width="1.2" opacity="0.8">
+        <path d="M50 35 L50 50 L65 50"/><path d="M255 35 L255 50 L240 50"/>
+        <path d="M50 372 L50 357 L65 357"/><path d="M255 372 L255 357 L240 357"/>
+        <circle cx="50" cy="35" r="3" fill="#c8901a"/><circle cx="255" cy="35" r="3" fill="#c8901a"/>
+        <circle cx="50" cy="372" r="3" fill="#c8901a"/><circle cx="255" cy="372" r="3" fill="#c8901a"/>
+      </g>
+      <circle cx="158" cy="175" r="68" fill="none" stroke="#c8901a" stroke-width="1" opacity="0.5"/>
+      <circle cx="158" cy="175" r="60" fill="rgba(80,40,140,0.3)" stroke="#d4a843" stroke-width="1.5"/>
+      <circle cx="158" cy="175" r="52" fill="none" stroke="#c8901a" stroke-width="0.5" opacity="0.4"/>
+      <g transform="translate(158,175)" fill="none" stroke="#d4a843" stroke-width="1" opacity="0.7" filter="url(#glow)">
+        <polygon points="0,-38 33,19 -33,19"/><polygon points="0,38 33,-19 -33,-19"/>
+        <circle cx="0" cy="0" r="12" fill="rgba(212,168,67,0.15)" stroke="#d4a843" stroke-width="1.5"/>
+      </g>
+      <g transform="translate(158,105)" filter="url(#glow)">
+        <path d="M-10,-14 Q-18,0 -10,14 Q-2,8 -2,0 Q-2,-8 -10,-14Z" fill="#d4a843" opacity="0.8"/>
+        <circle cx="2" cy="0" r="10" fill="none" stroke="#d4a843" stroke-width="1" opacity="0.4"/>
+      </g>
+      <g font-size="11" fill="#9060c0" opacity="0.6" font-family="serif">
+        <text x="68" y="100">ᚠ</text><text x="228" y="100">ᚢ</text>
+        <text x="68" y="270">ᚱ</text><text x="228" y="270">ᚷ</text>
+        <text x="148" y="82">ᛇ</text><text x="148" y="280">ᛟ</text>
+        <text x="80" y="185">ᚾ</text><text x="224" y="185">ᛏ</text>
+      </g>
+      <g fill="#d4a843" opacity="0.5" filter="url(#glow)">
+        <circle cx="90" cy="130" r="1.5"/><circle cx="220" cy="145" r="1"/>
+        <circle cx="100" cy="240" r="1"/><circle cx="215" cy="230" r="1.5"/>
+        <circle cx="130" cy="310" r="1"/><circle cx="190" cy="305" r="1"/>
+        <circle cx="75" cy="310" r="1.5"/><circle cx="235" cy="310" r="1"/>
+      </g>
+      <text x="158" y="320" text-anchor="middle" font-family="'Ma Shan Zheng',serif" font-size="22" fill="#d4a843" filter="url(#glow)">感恩日记</text>
+      <text x="158" y="342" text-anchor="middle" font-family="serif" font-size="10" fill="#a07840" letter-spacing="4">GRATITUDE JOURNAL</text>
+      <g stroke="#c8901a" stroke-width="0.8" opacity="0.6">
+        <line x1="90" y1="350" x2="226" y2="350"/><line x1="100" y1="354" x2="216" y2="354"/>
+        <circle cx="158" cy="350" r="3" fill="#c8901a"/>
+      </g>
+    </svg>
+    <div class="hand-wrapper" id="handWrapper" onclick="openBook()">
+      <img src="hand.jpg" alt="魔法之手" style="width:100%;display:block;mix-blend-mode:screen;filter:brightness(1.1);">
+    </div>
+  </div>
+  <div class="open-hint">触碰魔法之手，开启书卷</div>
+</div>
+
+<div class="screen hidden" id="calScreen">
+  <div class="cal-container">
+    <div class="cal-header">
+      <button class="cal-nav-btn" id="prevMonth">&#8249;</button>
+      <span class="cal-title" id="monthTitle"></span>
+      <button class="cal-nav-btn" id="nextMonth">&#8250;</button>
+    </div>
+    <div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+    <div class="days-grid" id="daysGrid">
+      <svg class="connector-svg" id="connectorSvg"></svg>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="moodModal">
+  <div class="modal-card">
+    <div class="modal-date" id="modalDate"></div>
+    <div class="modal-label">选择今天的心情</div>
+    <div class="mood-grid" id="moodGrid"></div>
+    <button class="modal-confirm" id="moodConfirm">进入今日页面 ✦</button>
+  </div>
+</div>
+
+<div class="screen hidden" id="journalScreen">
+  <div class="journal-container">
+    <div class="journal-top">
+      <button class="back-btn" id="backBtn">← 日历</button>
+      <span class="journal-date-title" id="journalDateTitle"></span>
+      <span class="selected-mood-display" id="moodDisplay"></span>
+    </div>
+    <div class="guide">今天我感恩……</div>
+    <textarea id="journalText" placeholder="写下让你心存感激的事情，无论多小都值得记录…"></textarea>
+    <button class="save-btn" id="saveBtn">保存今日感恩 ✦</button>
+  </div>
+</div>
+
+<script>
+const MOODS=[{e:'🩷'},{e:'💜'},{e:'💙'},{e:'🩵'},{e:'💚'},{e:'🧡'},{e:'🤍'}];
+let curY,curM,selDay=null,selMood=0;
+const today=new Date();
+
+const starsEl=document.getElementById('stars');
+for(let i=0;i<80;i++){
+  const s=document.createElement('div');s.className='star';
+  const size=Math.random()*2+1;
+  s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*3}s;animation-delay:${Math.random()*3}s`;
+  starsEl.appendChild(s);
+}
+
+function key(y,m,d){return`gj_${y}_${m}_${d}`;}
+function getEntry(y,m,d){try{return JSON.parse(localStorage.getItem(key(y,m,d))||'null');}catch{return null;}}
+function saveEntry(y,m,d,mood,text){localStorage.setItem(key(y,m,d),JSON.stringify({mood,text}));}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  const el=document.getElementById(id);el.classList.remove('hidden');
+  if(id==='calScreen')el.classList.add('entering');
+}
+
+function openBook(){
+  document.getElementById('handWrapper').classList.add('opening');
+  setTimeout(()=>{showScreen('calScreen');renderCalendar();},1000);
+}
+
+const months=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+const mLabels=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function renderCalendar(){
+  const grid=document.getElementById('daysGrid');
+  document.getElementById('monthTitle').textContent=`${curY} · ${months[curM]}`;
+  const firstDay=new Date(curY,curM,1).getDay();
+  const daysInMonth=new Date(curY,curM+1,0).getDate();
+  grid.querySelectorAll('.day-cell').forEach(e=>e.remove());
+  const cells=[];
+  for(let i=0;i<firstDay;i++){const e=document.createElement('div');e.className='day-cell empty';grid.appendChild(e);cells.push(null);}
+  for(let d=1;d<=daysInMonth;d++){
+    const entry=getEntry(curY,curM,d);
+    const cell=document.createElement('div');
+    const isToday=d===today.getDate()&&curM===today.getMonth()&&curY===today.getFullYear();
+    cell.className='day-cell'+(entry?' has-entry':'')+(isToday?' today':'');
+    if(entry){const h=document.createElement('span');h.className='heart-badge';h.textContent=MOODS[entry.mood]?.e||'💜';cell.appendChild(h);}
+    else{const n=document.createElement('span');n.className='day-num-small';n.textContent=d;cell.appendChild(n);}
+    cell.onclick=()=>openMoodModal(d);
+    grid.appendChild(cell);cells.push({d,el:cell,hasEntry:!!entry});
+  }
+  requestAnimationFrame(()=>drawConnectors(cells));
+}
+
+function drawConnectors(cells){
+  const svg=document.getElementById('connectorSvg');svg.innerHTML='';
+  const gridRect=document.getElementById('daysGrid').getBoundingClientRect();
+  const pts=[];
+  cells.forEach(c=>{if(c&&c.hasEntry){const r=c.el.getBoundingClientRect();pts.push({x:r.left-gridRect.left+r.width/2,y:r.top-gridRect.top+r.height/2});}});
+  for(let i=1;i<pts.length;i++){
+    const a=pts[i-1],b=pts[i];
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);
+    line.setAttribute('stroke','rgba(180,120,240,0.3)');line.setAttribute('stroke-width','1.5');line.setAttribute('stroke-dasharray','3 4');
+    svg.appendChild(line);
+  }
+}
+
+function openMoodModal(d){
+  selDay=d;const entry=getEntry(curY,curM,d);selMood=entry?entry.mood:0;
+  document.getElementById('modalDate').textContent=`${curY}年 ${mLabels[curM]} ${d}日`;
+  renderMoodGrid(selMood);document.getElementById('moodModal').classList.add('active');
+}
+
+function renderMoodGrid(selectedIdx){
+  const grid=document.getElementById('moodGrid');grid.innerHTML='';
+  MOODS.forEach((m,i)=>{const btn=document.createElement('span');btn.className='mood-btn'+(i===selectedIdx?' selected':'');btn.textContent=m.e;btn.onclick=()=>{selMood=i;renderMoodGrid(i);};grid.appendChild(btn);});
+}
+
+document.getElementById('moodConfirm').onclick=()=>{document.getElementById('moodModal').classList.remove('active');openJournal();};
+
+function openJournal(){
+  const entry=getEntry(curY,curM,selDay);
+  document.getElementById('journalDateTitle').textContent=`${curY}年${mLabels[curM]}${selDay}日`;
+  document.getElementById('moodDisplay').textContent=MOODS[selMood].e;
+  document.getElementById('journalText').value=entry?entry.text:'';
+  showScreen('journalScreen');
+}
+
+document.getElementById('saveBtn').onclick=()=>{
+  const text=document.getElementById('journalText').value.trim();
+  if(!text)return;
+  saveEntry(curY,curM,selDay,selMood,text);showScreen('calScreen');renderCalendar();
+};
+
+document.getElementById('backBtn').onclick=()=>{showScreen('calScreen');renderCalendar();};
+document.getElementById('prevMonth').onclick=()=>{curM--;if(curM<0){curM=11;curY--;}renderCalendar();};
+document.getElementById('nextMonth').onclick=()=>{curM++;if(curM>11){curM=0;curY++;}renderCalendar();};
+
+curY=today.getFullYear();curM=today.getMonth();
+</script>
+</body>
+</html>
