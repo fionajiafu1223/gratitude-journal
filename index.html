@@ -8,7 +8,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Ma+Shan+Zheng&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Serif SC',serif;background:radial-gradient(ellipse at 50% 30%,#2a1a4e 0%,#150d2e 60%,#0a0618 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#e8d5b7;}
-.bubbles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+.bubbles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;transition:opacity 1s;}
+.bubbles.dimmed{opacity:0.3;}
 .bubble{position:absolute;border-radius:50%;animation:floatBubble var(--dur) var(--delay) infinite ease-in-out;}
 @keyframes floatBubble{
   0%{transform:translateY(0) translateX(0) scale(1);}
@@ -17,9 +18,9 @@ body{font-family:'Noto Serif SC',serif;background:radial-gradient(ellipse at 50%
   100%{transform:translateY(0) translateX(0) scale(1);}
 }
 .screen{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:1;transition:opacity 0.6s;top:0;left:0;overflow-y:auto;}
-.screen.hidden{opacity:0;pointer-events:none;}
+.screen.hidden{opacity:0;pointer-events:none;visibility:hidden;}
 #coverScreen{flex-direction:column;}
-.book-scene{position:relative;width:min(300px,80vw);height:min(400px,calc(80vw*4/3));}
+.book-scene{position:relative;width:min(360px,70vw);height:min(480px,calc(70vw*4/3));}
 .book-svg{width:100%;height:100%;filter:drop-shadow(0 20px 60px rgba(80,40,160,0.6));}
 .open-hint{text-align:center;margin-top:1.5rem;font-size:12px;color:#a07840;letter-spacing:3px;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
@@ -30,20 +31,20 @@ body{font-family:'Noto Serif SC',serif;background:radial-gradient(ellipse at 50%
 #calScreen{flex-direction:column;padding:1rem;align-items:center;}
 #calScreen.entering{animation:fadeUp 0.8s forwards;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
-.cal-container{background:rgba(30,15,60,0.85);border:1px solid #7a5520;border-radius:20px;padding:1.2rem;width:100%;max-width:min(380px,calc(100vw - 2rem));box-shadow:0 0 40px rgba(120,80,20,0.3),inset 0 0 60px rgba(80,40,120,0.2);}
+.cal-container{background:rgba(245,238,220,0.96);border:1px solid #c8a870;border-radius:20px;padding:1.2rem;width:100%;max-width:min(380px,calc(100vw - 2rem));box-shadow:0 0 40px rgba(120,80,20,0.2);}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
-.cal-title{font-family:'Ma Shan Zheng',serif;font-size:18px;color:#d4a843;letter-spacing:2px;}
-.cal-nav-btn{background:none;border:1px solid #7a5520;border-radius:50%;width:28px;height:28px;color:#d4a843;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
-.cal-nav-btn:hover{background:rgba(212,168,67,0.15);}
+.cal-title{font-family:'Ma Shan Zheng',serif;font-size:18px;color:#7a4f1a;letter-spacing:2px;}
+.cal-nav-btn{background:none;border:1px solid #c8a870;border-radius:50%;width:28px;height:28px;color:#7a4f1a;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.cal-nav-btn:hover{background:rgba(180,130,60,0.1);}
 .weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:0.4rem;}
-.weekdays span{text-align:center;font-size:11px;color:#7a5c8a;padding:4px 0;letter-spacing:1px;}
+.weekdays span{text-align:center;font-size:11px;color:#9a7a4a;padding:4px 0;letter-spacing:1px;}
 .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;position:relative;}
-.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:12px;color:#c8a8e0;transition:background 0.2s;position:relative;}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:12px;color:#5a3a1a;transition:background 0.2s;position:relative;}
 .day-cell:hover:not(.empty){background:rgba(160,100,220,0.2);}
-.day-cell.today{background:rgba(120,60,180,0.3);color:#d4a843;font-weight:600;}
+.day-cell.today{background:rgba(180,130,60,0.2);color:#7a4f1a;font-weight:600;}
 .day-cell.empty{cursor:default;}
 .heart-badge{font-size:20px;line-height:1;}
-.day-num-small{font-size:9px;color:#7a5c8a;margin-top:1px;}
+.day-num-small{font-size:9px;color:#9a7a4a;margin-top:1px;}
 .day-cell.has-entry .day-num-small{display:none;}
 .connector-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
 .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,6,24,0.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s;}
@@ -166,8 +167,8 @@ textarea::placeholder{color:#b8986a;}
         <circle cx="130" cy="310" r="1"/><circle cx="190" cy="305" r="1"/>
         <circle cx="75" cy="310" r="1.5"/><circle cx="235" cy="310" r="1"/>
       </g>
-      <text x="158" y="320" text-anchor="middle" font-family="'Ma Shan Zheng',serif" font-size="22" fill="#d4a843" filter="url(#glow)">感恩日记</text>
-      <text x="158" y="342" text-anchor="middle" font-family="serif" font-size="10" fill="#a07840" letter-spacing="4">GRATITUDE JOURNAL</text>
+      <text x="158" y="310" text-anchor="middle" font-family="'Ma Shan Zheng',serif" font-size="38" fill="#d4a843" filter="url(#glow)">感恩日记</text>
+      <text x="158" y="336" text-anchor="middle" font-family="serif" font-size="10" fill="#a07840" letter-spacing="4">GRATITUDE JOURNAL</text>
       <g stroke="#c8901a" stroke-width="0.8" opacity="0.6">
         <line x1="90" y1="350" x2="226" y2="350"/><line x1="100" y1="354" x2="216" y2="354"/>
         <circle cx="158" cy="350" r="3" fill="#c8901a"/>
@@ -255,7 +256,7 @@ const bubbleColors=[
 ];
 for(let i=0;i<28;i++){
   const b=document.createElement('div');b.className='bubble';
-  const size=8+Math.random()*60;
+  const size=4+Math.random()*20;
   const op=0.15+Math.random()*0.35;
   const col=bubbleColors[Math.floor(Math.random()*bubbleColors.length)].replace('VAL',op);
   const fy=((-1+Math.random()*2)*15)+'px';
@@ -333,6 +334,7 @@ function renderMoodGrid(selectedIdx){
 document.getElementById('moodConfirm').onclick=()=>{document.getElementById('moodModal').classList.remove('active');openJournal();};
 
 function openJournal(){
+  document.getElementById('bubbles').classList.add('dimmed');
   const entry=getEntry(curY,curM,selDay);
   document.getElementById('journalDateTitle').textContent=`${curY}年${mLabels[curM]}${selDay}日`;
   document.getElementById('moodDisplay').textContent=MOODS[selMood].e;
@@ -343,10 +345,12 @@ function openJournal(){
 document.getElementById('saveBtn').onclick=()=>{
   const text=document.getElementById('journalText').value.trim();
   if(!text)return;
-  saveEntry(curY,curM,selDay,selMood,text);showScreen('calScreen');renderCalendar();
+  saveEntry(curY,curM,selDay,selMood,text);
+  document.getElementById('bubbles').classList.remove('dimmed');
+  showScreen('calScreen');renderCalendar();
 };
 
-document.getElementById('backBtn').onclick=()=>{showScreen('calScreen');renderCalendar();};
+document.getElementById('backBtn').onclick=()=>{document.getElementById('bubbles').classList.remove('dimmed');showScreen('calScreen');renderCalendar();};
 document.getElementById('prevMonth').onclick=()=>{curM--;if(curM<0){curM=11;curY--;}renderCalendar();};
 document.getElementById('nextMonth').onclick=()=>{curM++;if(curM>11){curM=0;curY++;}renderCalendar();};
 
